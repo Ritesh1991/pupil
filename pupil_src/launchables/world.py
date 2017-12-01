@@ -116,10 +116,13 @@ def world(timebase, eyes_are_alive, ipc_pub_url, ipc_sub_url,
         # Plug-ins
         from plugin import Plugin, System_Plugin_Base, Plugin_List, import_runtime_plugins
         from plugin_manager import Plugin_Manager
+
         from calibration_routines import calibration_plugins, gaze_mapping_plugins, Calibration_Plugin, Gaze_Mapping_Plugin
+        from object_detector_app import Object_Detection
+
         from fixation_detector import Fixation_Detector
         from recorder import Recorder
-        from display_recent_gaze import Display_Recent_Gaze
+        from display_recent_gaze_2 import Display_Recent_Gaze
         from time_sync import Time_Sync
         from pupil_remote import Pupil_Remote
         from pupil_groups import Pupil_Groups
@@ -134,6 +137,8 @@ def world(timebase, eyes_are_alive, ipc_pub_url, ipc_sub_url,
         from remote_recorder import Remote_Recorder
         from audio_capture import Audio_Capture
         from accuracy_visualizer import Accuracy_Visualizer
+        #from vis_circle import Vis_Circle  #custom plugin
+        
         # from saccade_detector import Saccade_Detector
         from system_graphs import System_Graphs
         from camera_intrinsics_estimation import Camera_Intrinsics_Estimation
@@ -177,7 +182,7 @@ def world(timebase, eyes_are_alive, ipc_pub_url, ipc_sub_url,
         runtime_plugins = import_runtime_plugins(os.path.join(g_pool.user_dir, 'plugins'))
         user_plugins = [Audio_Capture, Pupil_Groups, Frame_Publisher, Pupil_Remote, Time_Sync, Surface_Tracker,
                         Annotation_Capture, Log_History, Fixation_Detector, Blink_Detection,
-                        Remote_Recorder, Accuracy_Visualizer, Camera_Intrinsics_Estimation]
+                        Remote_Recorder, Accuracy_Visualizer, Camera_Intrinsics_Estimation, Object_Detection]
         system_plugins = [Log_Display, Display_Recent_Gaze, Recorder, Pupil_Data_Relay, Plugin_Manager, System_Graphs] + manager_classes + source_classes
         plugins = system_plugins + user_plugins + runtime_plugins + calibration_plugins + gaze_mapping_plugins
         user_plugins += [p for p in runtime_plugins if not isinstance(p, (Base_Manager, Base_Source, System_Plugin_Base,

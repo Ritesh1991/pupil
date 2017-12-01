@@ -3,7 +3,7 @@
 A real-time object recognition application in your world frame using [Google's TensorFlow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection) and [OpenCV](http://opencv.org/).  The idea here is to integrate eye-tracking with object recognition, so objects detected are displayed in your world frame and an 'X' overlays the object closest to your gaze.
 
 ## Getting Started
-1.  After starting 'main.py' open the 'Object Detection' Plugin from the menu and 
+1.  After starting 'main.py' open the 'Object Detection' Plugin from the menu and click 'Run Object Detection'.
 
 ## Tests
 ```

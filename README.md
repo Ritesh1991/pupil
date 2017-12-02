@@ -1,4 +1,16 @@
-**On this fork, I've added a real-time object-detection plugin for Pupil that integrates eye-tracking to identify which object the user is gazed upon.**
+**On this fork, I've added a real-time object-detection plugin for Pupil that integrates eye-tracking to identify which object the user is currrently gazing upon.**
+- Video Demo! https://youtu.be/MqqQnCbzryA
+- The plugin is located in pupil_src/shared_modules/object_detector_app and is registered in world.py
+
+This plugin, when run, shows the following real-time visualizations:
+1. Bounding boxes & labels around recognized objects
+2. Recent gaze points
+3. The object on which the user is focused (a 'X' is placed at the center of the object closest to the user's recent gaze)
+
+Other notes:
+- There is functionality in the plugin to send object detection information via ZMQ. 
+- This was developed using Tensorflow and was heavily inspired by Dat Tran's work (https://github.com/datitran/object_detector_app).
+- **This was run solely on CPU, so the model (trained on the COCO dataset) had to be very lightweight. I was able to achieve about 10-15 FPS, at the cost of apples being perceived as donuts.**
 
 # Pupil
 Open source eye tracking software platform that started as a thesis project at MIT. Pupil is a project in active, community driven development. Pupil mobile eye tracking hardware is accessible, hackable, and affordable. The software is open source and written in `Python` and `C++` when speed is an issue.

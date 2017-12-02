@@ -2,14 +2,15 @@
 - Video Demo! https://youtu.be/MqqQnCbzryA
 - The plugin is located in pupil_src/shared_modules/object_detector_app and is registered in world.py
 
-**Requirements:**
-- Tensorflow (1.2 or above)
-- OpenCV 3.0 (or above)
-
+![demo_example.png](/demo_example.png)
 **This plugin, when run, shows the following real-time visualizations:**
 1. Bounding boxes & labels around recognized objects
 2. Recent gaze points
 3. The object on which the user is focused (a 'X' is placed at the center of the object closest to the user's recent gaze)
+
+**Requirements:**
+- Tensorflow (1.2 or above)
+- OpenCV 3.0 (or above)
 
 **Other notes:**
 - There is functionality in the plugin to send object detection information via ZMQ. 

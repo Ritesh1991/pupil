@@ -1,6 +1,9 @@
 **On this fork, I've added a real-time object-detection plugin for Pupil that integrates eye-tracking to identify which object the user is currrently gazing upon.**
 - Video Demo! https://youtu.be/MqqQnCbzryA
 - The plugin is located in pupil_src/shared_modules/object_detector_app and is registered in world.py
+- Requirements:
+	- Tensorflow (1.2 or above)
+	- OpenCV 3.0 (or above)
 
 This plugin, when run, shows the following real-time visualizations:
 1. Bounding boxes & labels around recognized objects

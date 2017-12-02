@@ -38,6 +38,8 @@ import math
 import multiprocessing
 import numpy as np
 import tensorflow as tf
+import zmq
+from msgpack import loads
 
 from . utils.app_utils import draw_boxes_and_labels
 from . object_detection.utils import label_map_util
@@ -68,7 +70,7 @@ class Object_Detection(Visualizer_Plugin_Base):
     icon_chr = chr(0xe061)
     icon_font = 'pupil_icons'
 
-    def __init__(self, g_pool, num_workers = 2, queue_size = 3, frame = None, run=False):
+    def __init__(self, g_pool, num_workers = 2, queue_size = 2, frame = None, run=False):
         super().__init__(g_pool)
         
         self.order = 1
@@ -76,6 +78,7 @@ class Object_Detection(Visualizer_Plugin_Base):
         self.num_workers = num_workers
         self.queue_size = queue_size
         self.menu = None
+        self.label = 'label'
         self.run = run
 
         self.glfont = fontstash.Context()
@@ -91,6 +94,11 @@ class Object_Detection(Visualizer_Plugin_Base):
             t = Thread(target=self.worker, args=(self.input_q, self.output_q))
             t.daemon = True
             t.start()
+
+            #start another thread to publish information using zmq
+            t2 = Thread(target=self.publish_detected_object)
+            t2.daemon = True
+            t2.start()
 
 
     def recent_events(self, events):
@@ -123,18 +131,18 @@ class Object_Detection(Visualizer_Plugin_Base):
 
             for point, name, color in zip(rec_points, class_names, class_colors):
                 #define vertices necessary for drawing bounding boxes
-                top_left, top_right = [point['xmin'], point['ymax']], [point['xmax'],point['ymax']]
-                bottom_left, bottom_right = [point['xmin'],point['ymin']], [point['xmax'],point['ymin']]
-                top_left_label, top_right_label = top_left, [point['xmin']+len(name[0])*14/width, point['ymax']]
-                bottom_left_label, bottom_right_label = [point['xmin'],point['ymax']-30/height], [point['xmin']+len(name[0])*14/width, point['ymax']-30/height]
+                bottom_left, bottom_right = [point['xmin'], 1-point['ymax']], [point['xmax'], 1-point['ymax']]
+                top_left, top_right = [point['xmin'],1-point['ymin']], [point['xmax'], 1-point['ymin']]
+                top_left_label, top_right_label = top_left, [point['xmin']+len(name[0])*14/width, 1-point['ymin']]
+                bottom_left_label, bottom_right_label = [point['xmin'],1-(point['ymin']+30/height)], [point['xmin']+len(name[0])*14/width, 1-(point['ymin']+30/height)]
                 
-                center_bb = [(point['xmax']+point['xmin'])/2.0, (point['ymax']+point['ymin'])/2.0]
+                center_bb = [(point['xmax']+point['xmin'])/2.0, ((1-point['ymax'])+(1-point['ymin']))/2.0]
 
                 #distance between gaze point and center of bounding box (center_bb)
                 for pt,a in self.pupil_display_list:
                     dist = math.hypot(center_bb[0]-pt[0], center_bb[1]-pt[1])
                     # dist_list.append([dist, top_left[0]*width, (1-top_left[1])*height]) #for drawing text on detected object
-                    dist_list.append([dist, [center_bb[0]*width, (1-center_bb[1])*height]])
+                    dist_list.append([dist, [center_bb[0]*width, (1-center_bb[1])*height], name[0]])
 
                 #draw bounding box, label box, write label
                 verts_label = [top_left_label, top_right_label, bottom_right_label, bottom_left_label, top_left_label]
@@ -150,6 +158,8 @@ class Object_Detection(Visualizer_Plugin_Base):
             #draw an x on the detected_object closest to the gaze       
             if dist_list:    
                 draw_x([sorted(dist_list)[0][1]], size=50, thickness=5, color=RGBA(color[2]/255,color[1]/255,color[0]/255,.5))
+                self.label = sorted(dist_list)[0][2]
+                #print('self.label: ', self.label)
             #self.glfont.set_color_float((1.0,1.0,1.0, 1.0))
             #self.glfont.draw_text(sorted(dist_list)[0][1]+50, sorted(dist_list)[0][2], 'FIXATED OBJECT')
             #self.glfont.set_align_string(v_align='left', h_align='top')
@@ -211,18 +221,17 @@ class Object_Detection(Visualizer_Plugin_Base):
     def deinit_ui(self):
         self.remove_menu()
 
-    # def publish_detected_object(label):
-    #         context = zmq.Context()
-    #         socket = context.socket(zmq.PUB)
-    #         addr = '127.0.0.1'  # remote ip or localhost
-    #         port = "5556"  # same as in the pupil remote gui
-    #         socket.bind("tcp://{}:{}".format(addr, port))
-    #         time.sleep(1)
-    #         while label is not None:
-    #             topic = 'detected_object'
-    #             #print ('%s %s' % (topic, label))
-    #             try:
-    #                 socket.send_string('%s %s' % (topic, label))
-    #             except TypeError:
-    #                 socket.send('%s %s' % (topic, label))
-    #             break
+    def publish_detected_object(self):
+        context = zmq.Context()
+        socket = context.socket(zmq.PUB)
+        addr = '127.0.0.1'  # remote ip or localhost
+        port = "5556"  # same as in the pupil remote gui
+        socket.bind("tcp://{}:{}".format(addr, port))
+        time.sleep(1)
+        while self.label is not None:
+            topic = 'detected_object'
+            #print ('%s %s' % (topic, self.label))
+            try:
+                socket.send_string('%s %s' % (topic, self.label))
+            except TypeError:
+                socket.send('%s %s' % (topic, self.label))

@@ -10,12 +10,10 @@ See COPYING and COPYING.LESSER for license details.
 '''
 
 '''
-Adapted from Dat Tran's object detector app (https://github.com/datitran/object_detector_app)
-and adapted for a pupil plugin by Jesse Weisberg.
+Inspired by Dat Tran's object detector app (https://github.com/datitran/object_detector_app)
+and morphed into a pupil plugin with eye-tracking functionality by Jesse Weisberg.
 
 Detects object but also places an 'X' in the center of the object at which you are gazing.
-
-To be created: add fixation capability, use 
 '''
 
 from plugin import Visualizer_Plugin_Base

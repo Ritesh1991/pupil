@@ -1,5 +1,5 @@
 # A Pupil Plugin to Perceive the Object in Focus
-- **This fork includes a real-time object-detection plugin that integrates eye-tracking (fixation data) to identify which object the user is currently fixated upon.  An example of it's potential is shown in controlling grasps of a robotic prosthetic hand.**
+- **This fork includes a real-time object-detection plugin that integrates eye-tracking (fixation data) to identify which object the user is currently fixated upon.  An example of its potential is shown in controlling grasps of a robotic prosthetic hand.**
 - Video Demo of Plugin: https://youtu.be/MqqQnCbzryA
 - Video Demo of using the plugin to control a prosthetic hand: https://youtu.be/KYcfLEvbxSc
 - The plugin is located in pupil_src/shared_modules/object_detector_app and is registered in world.py
